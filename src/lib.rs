@@ -53,3 +53,6 @@ pub mod values;
 
 /// Various utilities
 pub mod util;
+
+/// An API for plugging new adapters
+pub mod adapt;
