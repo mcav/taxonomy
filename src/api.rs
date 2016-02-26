@@ -17,6 +17,8 @@ use devices::*;
 use requests::*;
 use values::Value;
 
+use std::sync::Arc;
+
 /// An error produced by one of the APIs in this module.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Error {
@@ -326,7 +328,7 @@ pub trait API: Send {
     /// # WebSocket API
     ///
     /// `/api/v1/services/watch`
-    fn register_service_watch(&self, Vec<WatchOptions>, cb: Box<FnMut(WatchEvent) + Send + 'static>) -> Self::WatchGuard;
+    fn register_service_watch(&self, Vec<WatchOptions>, cb: Arc<FnMut(WatchEvent) + Send + 'static>) -> Self::WatchGuard;
 
     /// A value that causes a disconnection once it is dropped.
     type WatchGuard;
