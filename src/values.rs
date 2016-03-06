@@ -5,6 +5,7 @@ use std::cmp::{PartialOrd, Ordering};
 use std::str::FromStr;
 use std::sync::Arc;
 
+use serde;
 use serde_json;
 use chrono::{Duration, DateTime, UTC};
 use serde::ser::{Serialize, Serializer};
@@ -81,8 +82,30 @@ impl Type {
     }
 }
 
-/// An on/off state. Internal representation may be either On or Off.
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+/// An on/off state.
+///
+/// # (De)serialization
+///
+/// Values of this state are represented by strings "On"|"Off".
+///
+/// ```
+/// extern crate serde;
+/// extern crate serde_json;
+/// extern crate foxbox_taxonomy;
+///
+/// let on = serde_json::to_string(&foxbox_taxonomy::values::OnOff::On).unwrap();
+/// assert_eq!(on, "\"On\"");
+///
+/// let on : foxbox_taxonomy::values::OnOff = serde_json::from_str("\"On\"").unwrap();
+/// assert_eq!(on, foxbox_taxonomy::values::OnOff::On);
+///
+/// let off = serde_json::to_string(&foxbox_taxonomy::values::OnOff::Off).unwrap();
+/// assert_eq!(off, "\"Off\"");
+///
+/// let off : foxbox_taxonomy::values::OnOff = serde_json::from_str("\"Off\"").unwrap();
+/// assert_eq!(off, foxbox_taxonomy::values::OnOff::Off);
+/// ```
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum OnOff {
     On,
     Off,
@@ -109,9 +132,35 @@ impl Ord for OnOff {
     }
 }
 
-/// An open/closed state. Internal representation may be either
-/// Open or Closed.
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+serde_impl!(OnOff(String) {
+    On => "On",
+    Off => "Off"
+});
+
+/// An open/closed state.
+///
+/// # (De)serialization
+///
+/// Values of this state are represented by strings "Open"|"Closed".
+///
+/// ```
+/// extern crate serde;
+/// extern crate serde_json;
+/// extern crate foxbox_taxonomy;
+///
+/// let open = serde_json::to_string(&foxbox_taxonomy::values::OpenClosed::Open).unwrap();
+/// assert_eq!(open, "\"Open\"");
+///
+/// let open : foxbox_taxonomy::values::OpenClosed = serde_json::from_str("\"Open\"").unwrap();
+/// assert_eq!(open, foxbox_taxonomy::values::OpenClosed::Open);
+///
+/// let closed = serde_json::to_string(&foxbox_taxonomy::values::OpenClosed::Closed).unwrap();
+/// assert_eq!(closed, "\"Closed\"");
+///
+/// let closed : foxbox_taxonomy::values::OpenClosed = serde_json::from_str("\"Closed\"").unwrap();
+/// assert_eq!(closed, foxbox_taxonomy::values::OpenClosed::Closed);
+/// ```
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum OpenClosed {
     Open,
     Closed,
@@ -137,6 +186,11 @@ impl Ord for OpenClosed {
         self.as_bool().cmp(&other.as_bool())
     }
 }
+
+serde_impl!(OpenClosed(String) {
+    Open => "Open",
+    Closed => "Closed"
+});
 
 /// A temperature. Internal representation may be either Fahrenheit or
 /// Celcius. The FoxBox adapters are expected to perform conversions
